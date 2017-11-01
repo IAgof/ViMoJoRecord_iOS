@@ -10,13 +10,7 @@ import Foundation
 import UIKit
 import AVFoundation
 
-protocol BarcodeDelegate: class {
-	func barcodeRead(barcode: String)
-}
-
 class RecordViewController: UIViewController {
-	
-	weak var delegate: BarcodeDelegate?
 	
 	var output = AVCaptureMetadataOutput()
 	var previewLayer: AVCaptureVideoPreviewLayer!
@@ -26,7 +20,6 @@ class RecordViewController: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		setupCamera()
-		// Do any additional setup after loading the view, typically from a nib.
 	}
 	
 	override func didReceiveMemoryWarning() {
@@ -86,9 +79,32 @@ class RecordViewController: UIViewController {
 	}
 	
 	private func setupCamera() {
-		
-		captureSession.sessionPreset = AVCaptureSession.Preset.high
-		
+		getQuality(quality: "high")
+		captureSession.beginConfiguration()
+		setDataInputs()
+		setDataOutputs()
+		captureSession.commitConfiguration()
+		previewCapture()
+	}
+	
+	private func getQuality(quality: String) {
+		switch quality {
+		case "low":
+			captureSession.sessionPreset = AVCaptureSession.Preset.low
+			break
+		case "medium":
+			captureSession.sessionPreset = AVCaptureSession.Preset.medium
+			break
+		case "high":
+			captureSession.sessionPreset = AVCaptureSession.Preset.high
+			break
+		default:
+			captureSession.sessionPreset = AVCaptureSession.Preset.high
+			break
+		}
+	}
+	
+	func setDataInputs() {
 		guard let device = AVCaptureDevice.default(for: .video),
 			let input = try? AVCaptureDeviceInput(device: device) else {
 				return
@@ -97,22 +113,28 @@ class RecordViewController: UIViewController {
 		if captureSession.canAddInput(input) {
 			captureSession.addInput(input)
 		}
+	}
+	
+	func setDataOutputs() {
+		let dataOutput = AVCaptureVideoDataOutput()
+		dataOutput.videoSettings = [((kCVPixelBufferPixelFormatTypeKey as NSString) as String) : NSNumber(value: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange as UInt32)]
 		
+		// Posibiltity to add metadata to the video (Blockchain? ÔwÔ)
+		/* let metadataOutput = AVCaptureMetadataOutput()*/
+		
+		if captureSession.canAddOutput(dataOutput) {
+			captureSession.addOutput(dataOutput)
+		}
+	}
+	
+	func previewCapture() {
 		previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
 		previewLayer.videoGravity = .resizeAspectFill
 		previewLayer.frame = view.bounds
 		view.layer.addSublayer(previewLayer)
+	}
+	
+	func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, fromConnection connection: AVCaptureConnection!) {
 		
-		let metadataOutput = AVCaptureMetadataOutput()
-		
-		if captureSession.canAddOutput(metadataOutput) {
-			captureSession.addOutput(metadataOutput)
-			
-			// metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
-			// metadataOutput.metadataObjectTypes = [.qr, .ean13]
-		} else {
-			print("Could not add metadata output")
-		}
-
 	}
 }
