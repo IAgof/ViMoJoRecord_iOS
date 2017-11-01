@@ -10,7 +10,15 @@ import Foundation
 import UIKit
 import AVFoundation
 
+protocol CameraFramesDelegate {
+	// func processCameraFrames(sampleBuffer : CMSampleBufferRef)
+}
+
 class RecordViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
+	
+	var delegate : CameraFramesDelegate?
+	
+	var device: AVCaptureDevice?
 	
 	var output = AVCaptureMetadataOutput()
 	var previewLayer: AVCaptureVideoPreviewLayer!
@@ -90,6 +98,9 @@ class RecordViewController: UIViewController, AVCaptureVideoDataOutputSampleBuff
 		setDataOutputs()
 		captureSession.commitConfiguration()
 		previewCapture()
+		
+		// Just testing, flash works
+		flashOn(device: device!)
 	}
 	
 	private func getQuality(quality: String) {
@@ -122,10 +133,12 @@ class RecordViewController: UIViewController, AVCaptureVideoDataOutputSampleBuff
 		                                                                 mediaType: mediaType,
 		                                                                 position: position).devices.first?.localizedName {}*/
 
-		guard let device = AVCaptureDevice.default(AVCaptureDevice.DeviceType.builtInWideAngleCamera, for: .video, position: .back),
-			let input = try? AVCaptureDeviceInput(device: device) else {
+		guard let element = AVCaptureDevice.default(AVCaptureDevice.DeviceType.builtInWideAngleCamera, for: .video, position: .back),
+			let input = try? AVCaptureDeviceInput(device: element) else {
 				return
 		}
+		
+		device = element
 		
 		if captureSession.canAddInput(input) {
 			captureSession.addInput(input)
@@ -154,6 +167,20 @@ class RecordViewController: UIViewController, AVCaptureVideoDataOutputSampleBuff
 	}
 	
 	func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, fromConnection connection: AVCaptureConnection!) {
-		
+		print("hey")
+	}
+	
+	private func flashOn(device:AVCaptureDevice) {
+		do {
+			if (device.hasTorch) {
+				try device.lockForConfiguration()
+				device.torchMode = .on
+				device.flashMode = .on
+				device.unlockForConfiguration()
+			}
+		} catch {
+			//DISABEL FLASH BUTTON HERE IF ERROR
+			print("Device tourch Flash Error ");
+		}
 	}
 }
