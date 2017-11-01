@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import AVFoundation
 
-class RecordViewController: UIViewController {
+class RecordViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
 	
 	var output = AVCaptureMetadataOutput()
 	var previewLayer: AVCaptureVideoPreviewLayer!
@@ -19,19 +19,24 @@ class RecordViewController: UIViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		// TO-DO: The app crashes if the user doesn't allow to access the camera & mic
+		CameraPermissions().askCameraIfNeeded()
+		MicrophonePermissions().askMicIfNeeded()
 		setupCamera()
 	}
 	
 	override func didReceiveMemoryWarning() {
 		super.didReceiveMemoryWarning()
-		// Dispose of any resources that can be recreated.
 	}
 	
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
-		
+		// After permissions are granted
 		if !captureSession.isRunning {
-			captureSession.startRunning()
+			let serialQueue = DispatchQueue(label: "vimojo.capture")
+			serialQueue.async {
+				self.captureSession.startRunning()
+			}
 		}
 	}
 	
@@ -105,7 +110,19 @@ class RecordViewController: UIViewController {
 	}
 	
 	func setDataInputs() {
-		guard let device = AVCaptureDevice.default(for: .video),
+		/* For Xcode 9 beta 5:
+		let deviceTypes = [
+			AVCaptureDevice.DeviceType.builtInTelephotoCamera,
+			AVCaptureDevice.DeviceType.builtInDualCamera,
+			AVCaptureDevice.DeviceType.builtInWideAngleCamera
+		]
+		let mediaType = AVMediaType.video
+		let position = AVCaptureDevice.Position.back
+		if let input = AVCaptureDevice.DiscoverySession(deviceTypes: deviceTypes,
+		                                                                 mediaType: mediaType,
+		                                                                 position: position).devices.first?.localizedName {}*/
+
+		guard let device = AVCaptureDevice.default(AVCaptureDevice.DeviceType.builtInWideAngleCamera, for: .video, position: .back),
 			let input = try? AVCaptureDeviceInput(device: device) else {
 				return
 		}
@@ -116,14 +133,16 @@ class RecordViewController: UIViewController {
 	}
 	
 	func setDataOutputs() {
-		let dataOutput = AVCaptureVideoDataOutput()
-		dataOutput.videoSettings = [((kCVPixelBufferPixelFormatTypeKey as NSString) as String) : NSNumber(value: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange as UInt32)]
+		let videoOutput = AVCaptureVideoDataOutput()
+		videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "com.DevStarlight.vimojoRecordQueue"))
+		
+		videoOutput.videoSettings = [((kCVPixelBufferPixelFormatTypeKey as NSString) as String) : NSNumber(value: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange as UInt32)]
 		
 		// Posibiltity to add metadata to the video (Blockchain? ÔwÔ)
 		/* let metadataOutput = AVCaptureMetadataOutput()*/
 		
-		if captureSession.canAddOutput(dataOutput) {
-			captureSession.addOutput(dataOutput)
+		if captureSession.canAddOutput(videoOutput) {
+			captureSession.addOutput(videoOutput)
 		}
 	}
 	
