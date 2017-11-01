@@ -6,7 +6,6 @@
 //  Copyright © 2017 MsHome. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import AVFoundation
 
@@ -16,44 +15,40 @@ protocol CameraFramesDelegate {
 
 class RecordViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
 	
-	var delegate : CameraFramesDelegate?
+	@IBOutlet weak var camPreview: UIView!
 	
-	var device: AVCaptureDevice?
+	let cameraButton = UIView()
 	
-	var output = AVCaptureMetadataOutput()
+	let captureSession = AVCaptureSession()
+	
+	let movieOutput = AVCaptureMovieFileOutput()
+	
 	var previewLayer: AVCaptureVideoPreviewLayer!
 	
-	var captureSession = AVCaptureSession()
+	var activeInput: AVCaptureDeviceInput!
+	
+	var outputURL: URL!
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		// TO-DO: The app crashes if the user doesn't allow to access the camera & mic
-		CameraPermissions().askCameraIfNeeded()
-		MicrophonePermissions().askMicIfNeeded()
-		setupCamera()
-	}
-	
-	override func didReceiveMemoryWarning() {
-		super.didReceiveMemoryWarning()
-	}
-	
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-		// After permissions are granted
-		if !captureSession.isRunning {
-			let serialQueue = DispatchQueue(label: "vimojo.capture")
-			serialQueue.async {
-				self.captureSession.startRunning()
-			}
-		}
-	}
-	
-	override func viewWillDisappear(_ animated: Bool) {
-		super.viewWillDisappear(animated)
 		
-		if captureSession.isRunning {
-			captureSession.stopRunning()
+		if setupSession() {
+			setupPreview()
+			startSession()
 		}
+		
+		cameraButton.isUserInteractionEnabled = true
+		
+		let cameraButtonRecognizer = UITapGestureRecognizer(target: self, action: #selector(RecordViewController.startCapture))
+		
+		cameraButton.addGestureRecognizer(cameraButtonRecognizer)
+		
+		cameraButton.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+		
+		cameraButton.backgroundColor = UIColor.red
+		
+		camPreview.addSubview(cameraButton)
+		
 	}
 	
 	override func viewDidLayoutSubviews() {
@@ -91,96 +86,183 @@ class RecordViewController: UIViewController, AVCaptureVideoDataOutputSampleBuff
 		
 	}
 	
-	private func setupCamera() {
-		getQuality(quality: "high")
-		captureSession.beginConfiguration()
-		setDataInputs()
-		setDataOutputs()
-		captureSession.commitConfiguration()
-		previewCapture()
-		
-		// Just testing, flash works
-		flashOn(device: device!)
-	}
 	
-	private func getQuality(quality: String) {
-		switch quality {
-		case "low":
-			captureSession.sessionPreset = AVCaptureSession.Preset.low
-			break
-		case "medium":
-			captureSession.sessionPreset = AVCaptureSession.Preset.medium
-			break
-		case "high":
-			captureSession.sessionPreset = AVCaptureSession.Preset.high
-			break
-		default:
-			captureSession.sessionPreset = AVCaptureSession.Preset.high
-			break
-		}
-	}
-	
-	func setDataInputs() {
-		/* For Xcode 9 beta 5:
-		let deviceTypes = [
-			AVCaptureDevice.DeviceType.builtInTelephotoCamera,
-			AVCaptureDevice.DeviceType.builtInDualCamera,
-			AVCaptureDevice.DeviceType.builtInWideAngleCamera
-		]
-		let mediaType = AVMediaType.video
-		let position = AVCaptureDevice.Position.back
-		if let input = AVCaptureDevice.DiscoverySession(deviceTypes: deviceTypes,
-		                                                                 mediaType: mediaType,
-		                                                                 position: position).devices.first?.localizedName {}*/
-
-		guard let element = AVCaptureDevice.default(AVCaptureDevice.DeviceType.builtInWideAngleCamera, for: .video, position: .back),
-			let input = try? AVCaptureDeviceInput(device: element) else {
-				return
-		}
-		
-		device = element
-		
-		if captureSession.canAddInput(input) {
-			captureSession.addInput(input)
-		}
-	}
-	
-	func setDataOutputs() {
-		let videoOutput = AVCaptureVideoDataOutput()
-		videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "com.DevStarlight.vimojoRecordQueue"))
-		
-		videoOutput.videoSettings = [((kCVPixelBufferPixelFormatTypeKey as NSString) as String) : NSNumber(value: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange as UInt32)]
-		
-		// Posibiltity to add metadata to the video (Blockchain? ÔwÔ)
-		/* let metadataOutput = AVCaptureMetadataOutput()*/
-		
-		if captureSession.canAddOutput(videoOutput) {
-			captureSession.addOutput(videoOutput)
-		}
-	}
-	
-	func previewCapture() {
+	func setupPreview() {
+		// Configure previewLayer
 		previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-		previewLayer.videoGravity = .resizeAspectFill
-		previewLayer.frame = view.bounds
-		view.layer.addSublayer(previewLayer)
+		previewLayer.frame = camPreview.bounds
+		previewLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
+		camPreview.layer.addSublayer(previewLayer)
 	}
 	
-	func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, fromConnection connection: AVCaptureConnection!) {
-		print("hey")
-	}
+	//MARK:- Setup Camera
 	
-	private func flashOn(device:AVCaptureDevice) {
+	func setupSession() -> Bool {
+		
+		captureSession.sessionPreset = AVCaptureSession.Preset.high
+		
+		// Setup Camera
 		do {
-			if (device.hasTorch) {
-				try device.lockForConfiguration()
-				device.torchMode = .on
-				device.flashMode = .on
-				device.unlockForConfiguration()
+			guard let camera = AVCaptureDevice.default(AVCaptureDevice.DeviceType.builtInWideAngleCamera, for: .video, position: .back),
+				let input = try? AVCaptureDeviceInput(device: camera) else {
+					return false
+			}
+			
+			if captureSession.canAddInput(input) {
+				captureSession.addInput(input)
+				activeInput = input
 			}
 		} catch {
-			//DISABEL FLASH BUTTON HERE IF ERROR
-			print("Device tourch Flash Error ");
+			print("Error setting device video input: \(error)")
+			return false
 		}
+		
+		// Setup Microphone
+		do {
+			guard let microphone = AVCaptureDevice.default(for: AVMediaType.audio),
+				let micInput = try? AVCaptureDeviceInput(device: microphone) else {
+					return false
+			}
+			
+			if captureSession.canAddInput(micInput) {
+				captureSession.addInput(micInput)
+			}
+		} catch {
+			print("Error setting device audio input: \(error)")
+			return false
+		}
+		
+		
+		// Movie output
+		if captureSession.canAddOutput(movieOutput) {
+			captureSession.addOutput(movieOutput)
+		}
+		
+		return true
+	}
+	
+	func setupCaptureMode(_ mode: Int) {
+		// Video Mode
+		
+	}
+	
+	//MARK:- Camera Session
+	func startSession() {
+		
+		
+		if !captureSession.isRunning {
+			videoQueue().async {
+				self.captureSession.startRunning()
+			}
+		}
+	}
+	
+	func stopSession() {
+		if captureSession.isRunning {
+			videoQueue().async {
+				self.captureSession.stopRunning()
+			}
+		}
+	}
+	
+	func videoQueue() -> DispatchQueue {
+		return DispatchQueue.main
+	}
+	
+	
+	
+	func currentVideoOrientation() -> AVCaptureVideoOrientation {
+		var orientation: AVCaptureVideoOrientation
+		
+		switch UIDevice.current.orientation {
+		case .portrait:
+			orientation = AVCaptureVideoOrientation.portrait
+		case .landscapeRight:
+			orientation = AVCaptureVideoOrientation.landscapeLeft
+		case .portraitUpsideDown:
+			orientation = AVCaptureVideoOrientation.portraitUpsideDown
+		default:
+			orientation = AVCaptureVideoOrientation.landscapeRight
+		}
+		
+		return orientation
+	}
+	
+	@objc func startCapture() {
+		
+		startRecording()
+		
+	}
+	
+	//EDIT 1: I FORGOT THIS AT FIRST
+	
+	func tempURL() -> URL? {
+		let directory = NSTemporaryDirectory() as NSString
+		
+		if directory != "" {
+			let path = directory.appendingPathComponent(NSUUID().uuidString + ".mp4")
+			return URL(fileURLWithPath: path)
+		}
+		
+		return nil
+	}
+	
+	
+	func startRecording() {
+		
+		if movieOutput.isRecording == false {
+			
+			let connection = movieOutput.connection(with: AVMediaType.video)
+			if (connection?.isVideoOrientationSupported)! {
+				connection?.videoOrientation = currentVideoOrientation()
+			}
+			
+			if (connection?.isVideoStabilizationSupported)! {
+				connection?.preferredVideoStabilizationMode = AVCaptureVideoStabilizationMode.auto
+			}
+			
+			let device = activeInput.device
+			if (device.isSmoothAutoFocusSupported) {
+				do {
+					try device.lockForConfiguration()
+					device.isSmoothAutoFocusEnabled = false
+					device.unlockForConfiguration()
+				} catch {
+					print("Error setting configuration: \(error)")
+				}
+				
+			}
+			
+			//EDIT2: And I forgot this
+			outputURL = tempURL()
+			movieOutput.startRecording(to: outputURL, recordingDelegate: self)
+			
+		}
+		else {
+			stopRecording()
+		}
+		
+	}
+	
+	func stopRecording() {
+		
+		if movieOutput.isRecording == true {
+			movieOutput.stopRecording()
+		}
+	}
+	
+	func capture(_ captureOutput: AVCaptureFileOutput!, didStartRecordingToOutputFileAt fileURL: URL!, fromConnections connections: [Any]!) {
+		
+	}
+	
+	func capture(_ captureOutput: AVCaptureFileOutput!, didFinishRecordingToOutputFileAt outputFileURL: URL!, fromConnections connections: [Any]!, error: Error!) {
+		if (error != nil) {
+			print("Error recording movie: \(error!.localizedDescription)")
+		} else {
+			
+			_ = outputURL as URL
+			
+		}
+		outputURL = nil
 	}
 }

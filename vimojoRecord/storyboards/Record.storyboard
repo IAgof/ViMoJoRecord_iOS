@@ -16,11 +16,26 @@
                     <view key="view" contentMode="scaleToFill" id="CqX-Uc-sib">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0Nx-Ej-EKh">
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Z9b-Ep-wid" firstAttribute="trailing" secondItem="0Nx-Ej-EKh" secondAttribute="trailing" id="XcR-0E-sJR"/>
+                            <constraint firstItem="Z9b-Ep-wid" firstAttribute="bottom" secondItem="0Nx-Ej-EKh" secondAttribute="bottom" id="cMX-MB-17F"/>
+                            <constraint firstItem="0Nx-Ej-EKh" firstAttribute="top" secondItem="Z9b-Ep-wid" secondAttribute="top" id="gqa-Gd-QTO"/>
+                            <constraint firstItem="0Nx-Ej-EKh" firstAttribute="leading" secondItem="Z9b-Ep-wid" secondAttribute="leading" id="hkh-va-b3I"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="Z9b-Ep-wid"/>
                     </view>
                     <nil key="simulatedTopBarMetrics"/>
                     <nil key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="camPreview" destination="0Nx-Ej-EKh" id="bXC-sV-kSZ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tt7-TG-81l" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
