@@ -5,8 +5,6 @@
 //  Created by Alejandro Arjonilla Garcia on 1/11/17.
 //  Copyright © 2017 MsHome. All rights reserved.
 //
-
-import Foundation
 import UIKit
 
 enum RecordButtonState {

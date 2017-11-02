@@ -5,14 +5,12 @@
 //  Created by Jesus Huerta on 31/10/2017.
 //  Copyright © 2017 MsHome. All rights reserved.
 //
-
-import UIKit
-import AVFoundation
 import AVKit
 
 struct RecorderParameters {
     let movieOutput: AVCaptureMovieFileOutput
-    let activeOutput: AVCaptureDeviceInput
+    let activeInput: AVCaptureDeviceInput
+	let outputURL: URL!
 }
 //protocol Presenter {
 //    var interactor: Interactor { get set }
@@ -37,9 +35,11 @@ class RecordViewController: UIViewController {
         cameraView = VideonaRecordView(frame: self.view.frame)
         recorder = VideonaRecorder(with: self,
                                    parameters: RecorderParameters(movieOutput: cameraView.movieOutput,
-                                                                  activeOutput: cameraView.activeInput))
+                                                                  activeInput: cameraView.activeInput,
+																  outputURL: cameraView.tempURL))
         button = RecordButton(frame: CGRect(x: 0, y: 0, width: 150, height: 40))
         button.recordState = .stopped
+		button.isUserInteractionEnabled = true
         button.addTarget(self, action: #selector(startRecording), for: .touchUpInside)
         self.view.addSubview(cameraView)
         self.view.addSubview(button)
@@ -57,7 +57,7 @@ extension RecordViewController: RecorderDelegate {
         switch response {
         case .error(let error): fatalError("Record stopped with error \n \(error)")
         case .success(let url):
-            print("Record stopped with URK \n \(url)")
+            print("Record stopped with URL \n \(url)")
             let playerViewController = AVPlayerViewController()
             let player = AVPlayer(url: url)
             playerViewController.player = player
@@ -65,8 +65,3 @@ extension RecordViewController: RecorderDelegate {
         }
     }
 }
-
-
-
-
-

@@ -6,7 +6,6 @@
 //  Copyright © 2017 MsHome. All rights reserved.
 //
 
-import Foundation
 import AVFoundation
 
 enum VideoResponse {
@@ -21,7 +20,7 @@ protocol RecorderDelegate {
     func recordStopped(with response: VideoResponse )
 }
 class VideonaRecorder: NSObject, RecorderProtocol {
-    var outputURL: URL!
+    var outputURL: URL
     var movieOutput: AVCaptureMovieFileOutput
     var activeInput: AVCaptureDeviceInput
     var delegate: RecorderDelegate
@@ -30,17 +29,10 @@ class VideonaRecorder: NSObject, RecorderProtocol {
          parameters: RecorderParameters) {
         self.delegate = delegate
         self.movieOutput = parameters.movieOutput
-        self.activeInput = parameters.activeOutput
+        self.activeInput = parameters.activeInput
+		self.outputURL = parameters.outputURL
     }
-    
-    var tempURL: URL? {
-        let directory = NSTemporaryDirectory() as NSString
-        if directory != "" {
-            let path = directory.appendingPathComponent(NSUUID().uuidString + ".mp4")
-            return URL(fileURLWithPath: path)
-        }
-        return nil
-    }
+	
    func startRecording() {
         if movieOutput.isRecording == false {
             let connection = movieOutput.connection(with: AVMediaType.video)
@@ -60,8 +52,6 @@ class VideonaRecorder: NSObject, RecorderProtocol {
                     print("Error setting configuration: \(error)")
                 }
             }
-            //EDIT2: And I forgot this
-            outputURL = tempURL
             movieOutput.startRecording(to: outputURL, recordingDelegate: self)
         }
         else {
@@ -75,7 +65,7 @@ class VideonaRecorder: NSObject, RecorderProtocol {
     }
 }
 
-extension VideonaRecorder:  AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureFileOutputRecordingDelegate {
+extension VideonaRecorder: AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureFileOutputRecordingDelegate {
     //TODO: make it rain
     func capture(_ captureOutput: AVCaptureFileOutput!, didStartRecordingToOutputFileAt fileURL: URL!, fromConnections connections: [Any]!) {
         print("Start capture didStartRecordingToOutputFileAt with fileURL \n\(fileURL)")

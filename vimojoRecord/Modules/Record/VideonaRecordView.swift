@@ -10,31 +10,28 @@ import UIKit
 import AVFoundation
 
 class VideonaRecordView: UIView {
-    let cameraButton = UIView()
     let captureSession = AVCaptureSession()
     var previewLayer: AVCaptureVideoPreviewLayer!
     var activeInput: AVCaptureDeviceInput!
-    var outputURL: URL!
     var videoQueue: DispatchQueue { return DispatchQueue.main }
     var movieOutput: AVCaptureMovieFileOutput = AVCaptureMovieFileOutput()
     var isCameraConfigured: Bool = false
-    
-    var tempURL: URL? {
-        let directory = NSTemporaryDirectory() as NSString
-        if directory != "" {
-            let path = directory.appendingPathComponent(NSUUID().uuidString + ".mp4")
-            return URL(fileURLWithPath: path)
-        }
-        return nil
-    }
-    var captureSessionPreset: AVCaptureSession.Preset = AVCaptureSession.Preset.hd1920x1080 {
+	
+    var captureSessionPreset: AVCaptureSession.Preset = AVCaptureSession.Preset.hd1280x720 {
         didSet{
-            captureSession.beginConfiguration()
             if captureSession.canSetSessionPreset(captureSessionPreset)
             { captureSession.sessionPreset = captureSessionPreset }
-            captureSession.commitConfiguration()
         }
     }
+	var tempURL: URL? {
+		let directory = NSTemporaryDirectory() as NSString
+		if directory != "" {
+			let path = directory.appendingPathComponent(NSUUID().uuidString + ".mp4")
+			return URL(fileURLWithPath: path)
+		}
+		return nil
+	}
+	
     override init(frame: CGRect) {
         super.init(frame: frame)
         configureCamera()
@@ -91,8 +88,8 @@ class VideonaRecordView: UIView {
     //MARK:- Setup Camera
     func setupSession(completion: (Bool) -> Void) {
         var sessionIsEnabled = false
-        sessionIsEnabled = setupCamera() && setupMic()
-        captureSessionPreset = .hd1920x1080
+        sessionIsEnabled = setupCamera() && setupMic() && setupOutput()
+        captureSessionPreset = .hd1280x720
         completion(sessionIsEnabled)
     }
     private func setupCamera() -> Bool {
@@ -113,6 +110,14 @@ class VideonaRecordView: UIView {
         }
         return true
     }
+	func setupOutput() -> Bool {
+		// Movie output
+		if captureSession.canAddOutput(movieOutput) {
+			captureSession.addOutput(movieOutput)
+			return true
+		}
+		return false
+	}
     //MARK:- Camera Session
     func startSession() {
         if !captureSession.isRunning {
