@@ -112,6 +112,7 @@ class VideonaRecordView: UIView {
     }
 	func setupOutput() -> Bool {
 		// Movie output
+		captureSession.movieFragmentInterval = kCMTimeInvalid
 		if captureSession.canAddOutput(movieOutput) {
 			captureSession.addOutput(movieOutput)
 			return true
