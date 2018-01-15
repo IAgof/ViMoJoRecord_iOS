@@ -10,6 +10,7 @@ import AVKit
 struct RecorderParameters {
     let movieOutput: AVCaptureMovieFileOutput
     let activeInput: AVCaptureDeviceInput
+    let dataOutput: AVCaptureVideoDataOutput
 	let outputURL: URL!
 }
 //protocol Presenter {
@@ -33,10 +34,13 @@ class RecordViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         cameraView = VideonaRecordView(frame: self.view.frame)
-        recorder = VideonaRecorder(with: self,
-                                   parameters: RecorderParameters(movieOutput: cameraView.movieOutput,
-                                                                  activeInput: cameraView.activeInput,
-																  outputURL: cameraView.tempURL))
+        recorder =
+            VideonaRecorder(with: self,
+                            parameters:
+                RecorderParameters(movieOutput: cameraView.movieOutput,
+                                   activeInput: cameraView.activeInput,
+                                   dataOutput: cameraView.dataOutput,
+                                   outputURL: cameraView.tempURL))
         button = RecordButton(frame: CGRect(x: 0, y: 0, width: 150, height: 40))
         button.recordState = .stopped
 		button.isUserInteractionEnabled = true

@@ -15,6 +15,7 @@ class VideonaRecordView: UIView {
     var activeInput: AVCaptureDeviceInput!
     var videoQueue: DispatchQueue { return DispatchQueue.main }
     var movieOutput: AVCaptureMovieFileOutput = AVCaptureMovieFileOutput()
+    var dataOutput = AVCaptureVideoDataOutput()
     var isCameraConfigured: Bool = false
 	
     var captureSessionPreset: AVCaptureSession.Preset = AVCaptureSession.Preset.hd1280x720 {
@@ -93,7 +94,7 @@ class VideonaRecordView: UIView {
         completion(sessionIsEnabled)
     }
     private func setupCamera() -> Bool {
-        guard let camera = AVCaptureDevice.default(AVCaptureDevice.DeviceType.builtInWideAngleCamera, for: .video, position: .back),
+        guard let camera = AVCaptureDevice.default(AVCaptureDevice.DeviceType.builtInWideAngleCamera, for: .video, position: .front),
             let input = try? AVCaptureDeviceInput(device: camera)
             else { return false }
         if captureSession.canAddInput(input) {
@@ -112,11 +113,14 @@ class VideonaRecordView: UIView {
     }
 	func setupOutput() -> Bool {
 		// Movie output
-		captureSession.movieFragmentInterval = kCMTimeInvalid
-		if captureSession.canAddOutput(movieOutput) {
-			captureSession.addOutput(movieOutput)
-			return true
-		}
+        dataOutput.videoSettings = [
+            kCVPixelBufferPixelFormatTypeKey as String : NSNumber(value: kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)
+        ]
+        dataOutput.alwaysDiscardsLateVideoFrames = true
+        if self.captureSession.canAddOutput(dataOutput) {
+            self.captureSession.addOutput(dataOutput)
+            return true
+        }
 		return false
 	}
     //MARK:- Camera Session
