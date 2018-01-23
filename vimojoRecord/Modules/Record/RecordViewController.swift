@@ -5,114 +5,67 @@
 //  Created by Jesus Huerta on 31/10/2017.
 //  Copyright © 2017 MsHome. All rights reserved.
 //
+import AVKit
 
-import Foundation
-import UIKit
-import AVFoundation
-
-protocol BarcodeDelegate: class {
-	func barcodeRead(barcode: String)
+struct RecorderParameters {
+    let movieOutput: AVCaptureMovieFileOutput
+    let activeInput: AVCaptureDeviceInput
+    let dataOutput: AVCaptureVideoDataOutput
+	let outputURL: URL!
+}
+//protocol Presenter {
+//    var interactor: Interactor { get set }
+////    func sendRecorderParameters(recorderParameters: RecorderParameters)
+//}
+////Implementation on presenter, not in extension :)
+//extension Presenter {
+//    func sendRecorderParameters(recorderParameters: RecorderParameters) {
+//        interactor.recorderParameters = recorderParameters
+//    }
+//}
+//protocol Interactor {
+//    var recorderParameters: RecorderParameters { get set }
+//}
+class RecordViewController: UIViewController {
+    var cameraView: VideonaRecordView!
+    var recorder: RecorderProtocol?
+    var button: RecordButton!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        cameraView = VideonaRecordView(frame: self.view.frame)
+        recorder =
+            VideonaRecorder(with: self,
+                            parameters:
+                RecorderParameters(movieOutput: cameraView.movieOutput,
+                                   activeInput: cameraView.activeInput,
+                                   dataOutput: cameraView.dataOutput,
+                                   outputURL: cameraView.tempURL))
+        button = RecordButton(frame: CGRect(x: 0, y: 0, width: 150, height: 40))
+        button.recordState = .stopped
+		button.isUserInteractionEnabled = true
+        button.addTarget(self, action: #selector(startRecording), for: .touchUpInside)
+        self.view.addSubview(cameraView)
+        self.view.addSubview(button)
+    }
+    @objc func startRecording() {
+        switch button.recordState {
+        case .stopped: recorder?.stopRecording()
+        case .recording: recorder?.startRecording()
+        }
+    }
 }
 
-class RecordViewController: UIViewController {
-	
-	weak var delegate: BarcodeDelegate?
-	
-	var output = AVCaptureMetadataOutput()
-	var previewLayer: AVCaptureVideoPreviewLayer!
-	
-	var captureSession = AVCaptureSession()
-	
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		setupCamera()
-		// Do any additional setup after loading the view, typically from a nib.
-	}
-	
-	override func didReceiveMemoryWarning() {
-		super.didReceiveMemoryWarning()
-		// Dispose of any resources that can be recreated.
-	}
-	
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-		
-		if !captureSession.isRunning {
-			captureSession.startRunning()
-		}
-	}
-	
-	override func viewWillDisappear(_ animated: Bool) {
-		super.viewWillDisappear(animated)
-		
-		if captureSession.isRunning {
-			captureSession.stopRunning()
-		}
-	}
-	
-	override func viewDidLayoutSubviews() {
-		super.viewDidLayoutSubviews()
-		
-		if let connection =  self.previewLayer?.connection  {
-			
-			let currentDevice: UIDevice = UIDevice.current
-			
-			let orientation: UIDeviceOrientation = currentDevice.orientation
-			
-			let previewLayerConnection : AVCaptureConnection = connection
-			
-			if previewLayerConnection.isVideoOrientationSupported {
-				
-				switch (orientation) {
-				case .portrait: updatePreviewLayer(layer: previewLayerConnection, orientation: .portrait)
-					break
-				case .landscapeRight: updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeLeft)
-					break
-				case .landscapeLeft: updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeRight)
-					break
-				default: updatePreviewLayer(layer: previewLayerConnection, orientation: .landscapeLeft)
-					break
-				}
-			}
-		}
-	}
-	
-	private func updatePreviewLayer(layer: AVCaptureConnection, orientation: AVCaptureVideoOrientation) {
-		
-		layer.videoOrientation = orientation
-		
-		previewLayer.frame = self.view.bounds
-		
-	}
-	
-	private func setupCamera() {
-		
-		captureSession.sessionPreset = AVCaptureSession.Preset.high
-		
-		guard let device = AVCaptureDevice.default(for: .video),
-			let input = try? AVCaptureDeviceInput(device: device) else {
-				return
-		}
-		
-		if captureSession.canAddInput(input) {
-			captureSession.addInput(input)
-		}
-		
-		previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-		previewLayer.videoGravity = .resizeAspectFill
-		previewLayer.frame = view.bounds
-		view.layer.addSublayer(previewLayer)
-		
-		let metadataOutput = AVCaptureMetadataOutput()
-		
-		if captureSession.canAddOutput(metadataOutput) {
-			captureSession.addOutput(metadataOutput)
-			
-			// metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
-			// metadataOutput.metadataObjectTypes = [.qr, .ean13]
-		} else {
-			print("Could not add metadata output")
-		}
-
-	}
+extension RecordViewController: RecorderDelegate {
+    func recordStopped(with response: VideoResponse) {
+        switch response {
+        case .error(let error): fatalError("Record stopped with error \n \(error)")
+        case .success(let url):
+            print("Record stopped with URL \n \(url)")
+            let playerViewController = AVPlayerViewController()
+            let player = AVPlayer(url: url)
+            playerViewController.player = player
+            self.present(playerViewController, animated: true, completion: nil)
+        }
+    }
 }

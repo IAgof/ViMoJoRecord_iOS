@@ -7,25 +7,31 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A98D61CA1FAA2DE00082F3C6 /* VideonaRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A98D61C91FAA2DE00082F3C6 /* VideonaRecordView.swift */; };
+		A98D61CC1FAA37FB0082F3C6 /* VideonaRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A98D61CB1FAA37FB0082F3C6 /* VideonaRecorder.swift */; };
+		A98D61CE1FAA430C0082F3C6 /* RecordButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A98D61CD1FAA430C0082F3C6 /* RecordButton.swift */; };
 		AE477A0C1FA88EC80071FFE6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE477A0B1FA88EC80071FFE6 /* AppDelegate.swift */; };
 		AE477A0E1FA88EC80071FFE6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE477A0D1FA88EC80071FFE6 /* ViewController.swift */; };
-		AE477A111FA88EC80071FFE6 /* Permissions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AE477A0F1FA88EC80071FFE6 /* Permissions.storyboard */; };
 		AE477A131FA88EC80071FFE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AE477A121FA88EC80071FFE6 /* Assets.xcassets */; };
-		AE477A241FA8B8A90071FFE6 /* PermissionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE477A231FA8B8A90071FFE6 /* PermissionsViewController.swift */; };
 		AE477A261FA8BABE0071FFE6 /* Record.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AE477A251FA8BABE0071FFE6 /* Record.storyboard */; };
 		AE477A281FA8BEA20071FFE6 /* RecordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE477A271FA8BEA20071FFE6 /* RecordViewController.swift */; };
+		AEFB9CA01FA9F6CD00943D8B /* CameraPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEFB9C9F1FA9F6CD00943D8B /* CameraPermissions.swift */; };
+		AEFB9CA21FA9F73C00943D8B /* MicrophonePermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEFB9CA11FA9F73C00943D8B /* MicrophonePermissions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A98D61C91FAA2DE00082F3C6 /* VideonaRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideonaRecordView.swift; sourceTree = "<group>"; };
+		A98D61CB1FAA37FB0082F3C6 /* VideonaRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideonaRecorder.swift; sourceTree = "<group>"; };
+		A98D61CD1FAA430C0082F3C6 /* RecordButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordButton.swift; sourceTree = "<group>"; };
 		AE477A081FA88EC80071FFE6 /* vimojoRecord.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = vimojoRecord.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE477A0B1FA88EC80071FFE6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AE477A0D1FA88EC80071FFE6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		AE477A101FA88EC80071FFE6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Permissions.storyboard; sourceTree = "<group>"; };
 		AE477A121FA88EC80071FFE6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AE477A171FA88EC80071FFE6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AE477A231FA8B8A90071FFE6 /* PermissionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PermissionsViewController.swift; path = vimojoRecord/Modules/Permissions.swift/PermissionsViewController.swift; sourceTree = SOURCE_ROOT; };
 		AE477A251FA8BABE0071FFE6 /* Record.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Record.storyboard; sourceTree = "<group>"; };
 		AE477A271FA8BEA20071FFE6 /* RecordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RecordViewController.swift; path = vimojoRecord/Modules/Record/RecordViewController.swift; sourceTree = SOURCE_ROOT; };
+		AEFB9C9F1FA9F6CD00943D8B /* CameraPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPermissions.swift; sourceTree = "<group>"; };
+		AEFB9CA11FA9F73C00943D8B /* MicrophonePermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrophonePermissions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +64,7 @@
 		AE477A0A1FA88EC80071FFE6 /* vimojoRecord */ = {
 			isa = PBXGroup;
 			children = (
+				AEFB9C9E1FA9F6B300943D8B /* Helpers */,
 				AE477A0B1FA88EC80071FFE6 /* AppDelegate.swift */,
 				AE477A0D1FA88EC80071FFE6 /* ViewController.swift */,
 				AE477A221FA8B8590071FFE6 /* Modules */,
@@ -71,7 +78,6 @@
 		AE477A1E1FA8B6BA0071FFE6 /* storyboards */ = {
 			isa = PBXGroup;
 			children = (
-				AE477A0F1FA88EC80071FFE6 /* Permissions.storyboard */,
 				AE477A251FA8BABE0071FFE6 /* Record.storyboard */,
 			);
 			path = storyboards;
@@ -80,7 +86,6 @@
 		AE477A221FA8B8590071FFE6 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				AE477A2A1FA8BF6B0071FFE6 /* Permissions */,
 				AE477A291FA8BF640071FFE6 /* Record */,
 			);
 			path = Modules;
@@ -90,16 +95,20 @@
 			isa = PBXGroup;
 			children = (
 				AE477A271FA8BEA20071FFE6 /* RecordViewController.swift */,
+				A98D61CD1FAA430C0082F3C6 /* RecordButton.swift */,
+				A98D61CB1FAA37FB0082F3C6 /* VideonaRecorder.swift */,
+				A98D61C91FAA2DE00082F3C6 /* VideonaRecordView.swift */,
 			);
 			path = Record;
 			sourceTree = "<group>";
 		};
-		AE477A2A1FA8BF6B0071FFE6 /* Permissions */ = {
+		AEFB9C9E1FA9F6B300943D8B /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				AE477A231FA8B8A90071FFE6 /* PermissionsViewController.swift */,
+				AEFB9C9F1FA9F6CD00943D8B /* CameraPermissions.swift */,
+				AEFB9CA11FA9F73C00943D8B /* MicrophonePermissions.swift */,
 			);
-			path = Permissions;
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -163,7 +172,6 @@
 			files = (
 				AE477A261FA8BABE0071FFE6 /* Record.storyboard in Resources */,
 				AE477A131FA88EC80071FFE6 /* Assets.xcassets in Resources */,
-				AE477A111FA88EC80071FFE6 /* Permissions.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -174,25 +182,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A98D61CE1FAA430C0082F3C6 /* RecordButton.swift in Sources */,
 				AE477A0E1FA88EC80071FFE6 /* ViewController.swift in Sources */,
-				AE477A241FA8B8A90071FFE6 /* PermissionsViewController.swift in Sources */,
 				AE477A281FA8BEA20071FFE6 /* RecordViewController.swift in Sources */,
+				AEFB9CA01FA9F6CD00943D8B /* CameraPermissions.swift in Sources */,
+				AEFB9CA21FA9F73C00943D8B /* MicrophonePermissions.swift in Sources */,
+				A98D61CA1FAA2DE00082F3C6 /* VideonaRecordView.swift in Sources */,
 				AE477A0C1FA88EC80071FFE6 /* AppDelegate.swift in Sources */,
+				A98D61CC1FAA37FB0082F3C6 /* VideonaRecorder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		AE477A0F1FA88EC80071FFE6 /* Permissions.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				AE477A101FA88EC80071FFE6 /* Base */,
-			);
-			name = Permissions.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		AE477A181FA88EC80071FFE6 /* Debug */ = {
@@ -306,12 +307,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JLVLW76696;
+				DEVELOPMENT_TEAM = 98YJ9HU6W9;
 				INFOPLIST_FILE = vimojoRecord/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.DevStarlight.vimojoRecord;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -321,12 +324,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JLVLW76696;
+				DEVELOPMENT_TEAM = 98YJ9HU6W9;
 				INFOPLIST_FILE = vimojoRecord/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.DevStarlight.vimojoRecord;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
